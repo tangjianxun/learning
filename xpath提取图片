@@ -1,0 +1,27 @@
+import requests
+import os
+from lxml import etree
+if __name__ == '__main__':
+    url = 'https://pic.netbian.com/4kdongman/'
+    headers = {
+        'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36'
+    }
+    #创建一个文件夹
+    if not os.path.exists('./tupian'):
+        os.mkdir('./tupian')
+
+    page_text = requests.get(url = url,headers=headers).text
+    tree = etree.HTML(page_text)
+    li_text = tree.xpath('//div[@class="slist"]/ul/li')
+    for li in li_text:
+        tupian_text ='https://pic.netbian.com'+li.xpath('./a/img/@src')[0]
+        name_text = li.xpath('./a/img/@alt')[0]+'.jpg'
+        #通用处理中文乱码的解决方案
+        name_text = name_text.encode('iso-8859-1').decode('gbk')
+
+        #请求图片进行持久化存储
+        img_data = requests.get(url = tupian_text,headers = headers).content
+        img_path = 'tupian'+name_text
+        with open(img_path,'wb') as fp:
+            fp.write(img_data)
+            print(img_path,'打印成功！！！')
