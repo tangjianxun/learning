@@ -1,0 +1,20 @@
+
+        —from bs4 import BeautifulSoup
+        —对象的实例化：
+             —1.将本地的html文档中的数据加载到该对象中
+                    fp = open('./test.html',/'r',encoding='utf-8')
+                    soup = BeautifulSoup(fp,'lxml')
+             —2.将互联网上获取的页面源码加载到该对象中
+                        page_text = response.text
+                        soup = BeautifulSoup(page_text,'lxml')
+        —提供的用于数据解析的办法和属性：
+             — soup.tanName:返回的是文档中第一次出现的tagName对应的标签
+             — soup.find():
+                    — find('tagName'):等同于soup.div
+                    — 属性定位：
+                        —soup.find('div',class_/id/attr='song')
+             — soup.find_all('tagName'):返回符合要求的所有标签（列表）
+        — select:
+            — select('某种选择器（id, class,标签...选择器）'),返回的是一个列表
+            — 层级选择器：
+                — soup.select('.tang > ul > li > a'):>表示的是一个层级
