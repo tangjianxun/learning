@@ -1,0 +1,35 @@
+#requests.get()是同步的代码，相当于异步的aiohttp
+import asyncio
+import aiohttp
+
+urls = {
+    "https://img1.baidu.com/it/u=2539954071,1131350017&fm=26&fmt=auto&gp=0.jpg",
+    'https://img08.tooopen.com/20210531/tooopen_v22252525258a2912ec-1124-4520-945f-9a117bc69d5d.jpg',
+    'https://img08.tooopen.com/20210531/tooopen_v22251825189c6e9e69-62d9-4052-a7cc-9db99845f369.jpg',
+    'https://img08.tooopen.com/20210531/tooopen_v222350235005780c10-65d4-4c5c-a132-573dbee918df.jpg'
+}
+
+
+#resp.content.read()  ==> resp.content   #读取图片等等，用content二进制数据
+
+async def aiodownload(url):
+    #发送请求
+    #得到图片内容
+    #保存到图片
+    name = url.rsplit("/",1)[1]
+    async with aiohttp.ClientSession()as session:  #相当于同步操作中的requests
+            async with session.get(url) as resp:   #相当于requests.get()
+                #请求回来，写入数据
+                with open(name,mode="wb") as f:     #创建文件
+                    f.write(await resp.content.read())  #读取的内容是异步的，需要await挂起，resp.text()
+    print(name,'完成')
+
+async def main():
+    tasks = []
+    for url in urls:
+        tasks.append(aiodownload(url))
+
+    await asyncio.wait(tasks)
+
+if __name__ == '__main__':
+    asyncio.run(main())
