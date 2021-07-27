@@ -1,0 +1,35 @@
+import requests
+from lxml import etree
+import csv
+from concurrent.futures import ThreadPoolExecutor
+
+f = open("data.csv",mode="w",encoding="utf-8")
+csvwriter = csv.writer(f)
+
+url = "http://www.xinfadi.com.cn/priceDetail.html"
+headers = {
+        "User-Agent" : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36"
+ }
+param = {
+    "limit": 20,
+    "current":'i',
+    "pubDateStartTime":"",
+    "pubDateEndTime":"",
+    "prodPcatid":"" ,
+    "prodCatid":"",
+    "prodName":""
+}
+def download_one_page(url):
+    #拿到页面的源码
+    resp = requests.get(url=url,params=param,headers=headers)
+    html = etree.HTML(resp.text)
+    table = html.xpath("/html/body/div[2]/div/div/div/div[4]/div[1]")[0]
+    trs = table.xpath("./tr[position()>1]")
+    for tr in trs:
+        txt = tr.xpath("./td/text()")
+        csvwriter.writerow(txt)
+if __name__ == '__main__':
+    with ThreadPoolExecutor(50) as t:
+        for i in range(1,200):
+            t.submit(download_one_page,param)
+    print("下载完成！！！")
